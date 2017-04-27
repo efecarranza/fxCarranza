@@ -33,12 +33,12 @@ if __name__ == "__main__":
         np.random.seed(42)  # Fix the randomness
 
         S0 = 1.5000
-        spread = 0.002
+        spread = 0.0002
         mu_dt = 1400  # Milliseconds
         sigma_dt = 100  # Millseconds
-        ask = copy.deepcopy(S0) + spread / 2.0
-        bid = copy.deepcopy(S0) - spread / 2.0
-        days = month_weekdays(2014, 1)  # January 2014
+        ask = copy.deepcopy(S0) + spread
+        bid = copy.deepcopy(S0) - spread
+        days = month_weekdays(2017, 1)  # January 2017
         current_time = datetime.datetime(
             days[0].year, days[0].month, days[0].day, 0, 0, 0,
         )
