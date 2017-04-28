@@ -15,19 +15,23 @@ from qsforex.client.base_client import BaseClient
 
 
 class Portfolio(object):
-    def __init__(
-        self, ticker, events, home_currency="USD",
-        leverage=20, risk_per_trade=Decimal("0.02"),
-        backtest=True
-    ):
+    RISK_PER__TRADE_MAX = Decimal("0.02")
+    RISK_PER_TRADE_ONE_PCT = Decimal("0.01")
+    RISK_PER_TRADE_HALF = Decimal("0.005")
+    RISK_PER_TRADE_MIN = Decimal("0.0025")
+    MAXIMUM_LEVERAGE = 10
+
+    def __init__(self, ticker, events, home_currency="USD", backtest=True):
+        self.win_streak = 0
+        self.lose_streak = 0
         self.ticker = ticker
         self.events = events
         self.home_currency = home_currency
-        self.leverage = leverage
+        self.leverage = self.MAXIMUM_LEVERAGE
         self.backtest = backtest
         self.equity = self._get_account_balance()
         self.balance = deepcopy(self.equity)
-        self.risk_per_trade = risk_per_trade
+        self.risk_per_trade = self.RISK_PER__TRADE_MAX
         self.trade_units = self.calc_risk_position_size()
         self.positions = {}
         if self.backtest:
@@ -145,7 +149,6 @@ class Portfolio(object):
             self.backtest_file.write(out_line)
 
     def execute_signal(self, signal_event):
-        print(self.ticker)
         # Check that the prices ticker contains all necessary
         # currency pairs prior to executing an order
         execute = True

@@ -54,6 +54,8 @@ class OANDAExecutionHandler(ExecutionHandler):
         return httplib.HTTPSConnection(self.domain)
 
     def execute_order(self, event):
+        print('Executing Order')
+        return
         instrument = "%s_%s" % (event.instrument[:3], event.instrument[3:])
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",

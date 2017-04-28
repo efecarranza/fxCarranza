@@ -73,9 +73,7 @@ if __name__ == "__main__":
     # Create the portfolio object that will be used to
     # compare the OANDA positions with the local, to
     # ensure backtesting integrity.
-    portfolio = Portfolio(
-        prices, events, backtest=False
-    )
+    portfolio = Portfolio(prices, events, backtest=False)
 
     # Create the execution handler making sure to
     # provide authentication commands
