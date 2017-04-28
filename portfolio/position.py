@@ -16,11 +16,6 @@ class Position(object):
         self.profit_perc = self.calculate_profit_perc()
 
     def set_up_currencies(self):
-        self.base_currency = self.currency_pair[:3]    # For EUR/USD, this is EUR
-        self.quote_currency = self.currency_pair[3:]   # For EUR/USD, this is USD
-        # For EUR/USD, with account denominated in GBP, this is USD/GBP
-        self.quote_home_currency_pair = "%s%s" % (self.quote_currency, self.home_currency)
-
         ticker_cur = self.ticker.prices[self.currency_pair]
         if self.position_type == "long":
             self.avg_price = Decimal(str(ticker_cur["ask"]))
@@ -42,7 +37,7 @@ class Position(object):
 
     def calculate_profit_base(self):
         pips = self.calculate_pips()
-        ticker_qh = self.ticker.prices[self.quote_home_currency_pair]
+        ticker_qh = self.ticker.prices[self.currency_pair]
         if self.position_type == "long":
             qh_close = ticker_qh["bid"]
         else:
@@ -81,10 +76,9 @@ class Position(object):
     def remove_units(self, units):
         dec_units = Decimal(str(units))
         ticker_cp = self.ticker.prices[self.currency_pair]
-        ticker_qh = self.ticker.prices[self.quote_home_currency_pair]
         if self.position_type == "long":
             remove_price = ticker_cp["bid"]
-            qh_close = ticker_qh["ask"]
+            qh_close = ticker_cp["ask"]
         else:
             remove_price = ticker_cp["ask"]
             qh_close = ticker_qh["bid"]
@@ -97,7 +91,6 @@ class Position(object):
 
     def close_position(self):
         ticker_cp = self.ticker.prices[self.currency_pair]
-        ticker_qh = self.ticker.prices[self.quote_home_currency_pair]
         if self.position_type == "long":
             qh_close = ticker_qh["ask"]
         else:

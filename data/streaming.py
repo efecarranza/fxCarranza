@@ -8,16 +8,10 @@ import requests
 
 from qsforex.event.event import TickEvent
 from qsforex.data.price import PriceHandler
-
+from qsforex.client.base_client import BaseClient
 
 class StreamingForexPrices(PriceHandler):
-    def __init__(
-        self, domain, access_token, 
-        account_id, pairs, events_queue
-    ):
-        self.domain = domain
-        self.access_token = access_token
-        self.account_id = account_id
+    def __init__(self, pairs, events_queue):
         self.events_queue = events_queue
         self.pairs = pairs
         self.prices = self._set_up_prices_dict()
@@ -42,19 +36,8 @@ class StreamingForexPrices(PriceHandler):
     def connect_to_stream(self):
         pairs_oanda = ["%s_%s" % (p[:3], p[3:]) for p in self.pairs]
         pair_list = ",".join(pairs_oanda)
-        try:
-            requests.packages.urllib3.disable_warnings()
-            s = requests.Session()
-            url = "https://" + self.domain + "/v1/prices"
-            headers = {'Authorization' : 'Bearer ' + self.access_token}
-            params = {'instruments' : pair_list, 'accountId' : self.account_id}
-            req = requests.Request('GET', url, headers=headers, params=params)
-            pre = req.prepare()
-            resp = s.send(pre, stream=True, verify=False)
-            return resp
-        except Exception as e:
-            s.close()
-            print("Caught exception when connecting to stream\n" + str(e))
+        
+        return BaseClient().connect_to_stream(pair_list)
 
     def stream_to_queue(self):
         response = self.connect_to_stream()
@@ -70,15 +53,15 @@ class StreamingForexPrices(PriceHandler):
                         "Caught exception when converting message into json: %s" % str(e)
                     )
                     return
-                if "instrument" in msg or "tick" in msg:
+                if "instrument" in msg:
                     self.logger.debug(msg)
                     getcontext().rounding = ROUND_HALF_DOWN 
-                    instrument = msg["tick"]["instrument"].replace("_", "")
-                    time = msg["tick"]["time"]
-                    bid = Decimal(str(msg["tick"]["bid"])).quantize(
+                    instrument = msg["instrument"].replace("_", "")
+                    time = msg["time"]
+                    bid = Decimal(str(msg["bids"][0]["price"])).quantize(
                         Decimal("0.00001")
                     )
-                    ask = Decimal(str(msg["tick"]["ask"])).quantize(
+                    ask = Decimal(str(msg["asks"][0]["price"])).quantize(
                         Decimal("0.00001")
                     )
                     self.prices[instrument]["bid"] = bid

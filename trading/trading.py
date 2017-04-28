@@ -2,6 +2,8 @@ import copy
 from decimal import Decimal, getcontext
 import logging
 import logging.config
+from inspect import getsourcefile
+from os.path import abspath, dirname, join, normpath
 try:
     import Queue as queue
 except ImportError:
@@ -46,7 +48,9 @@ def trade(events, strategy, portfolio, execution, heartbeat):
 
 if __name__ == "__main__":
     # Set up logging
-    logging.config.fileConfig('../logging.conf')
+    this_src_path = dirname(abspath(getsourcefile(lambda:0)))
+    log_conf_file = join('..', 'logging.conf')
+    logging.config.fileConfig(normpath(join(this_src_path, log_conf_file)))
     logger = logging.getLogger('qsforex.trading.trading')
 
     # Set the number of decimal places to 2
@@ -61,10 +65,7 @@ if __name__ == "__main__":
 
     # Create the OANDA market price streaming class
     # making sure to provide authentication commands
-    prices = StreamingForexPrices(
-        settings.STREAM_DOMAIN, settings.ACCESS_TOKEN, 
-        settings.ACCOUNT_ID, pairs, events
-    )
+    prices = StreamingForexPrices(pairs, events)
 
     # Create the strategy/signal generator, passing the 
     # instrument and the events queue
