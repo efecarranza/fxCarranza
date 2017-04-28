@@ -11,27 +11,43 @@ from qsforex.event.event import OrderEvent
 from qsforex.performance.performance import create_drawdowns
 from qsforex.portfolio.position import Position
 from qsforex.settings import OUTPUT_RESULTS_DIR
+from qsforex.client.base_client import BaseClient
 
 
 class Portfolio(object):
     def __init__(
-        self, ticker, events, home_currency="USD", 
-        leverage=20, equity=Decimal("100000.00"), 
-        risk_per_trade=Decimal("0.02"), backtest=True
+        self, ticker, events, home_currency="USD",
+        leverage=20, risk_per_trade=Decimal("0.02"),
+        backtest=True
     ):
         self.ticker = ticker
         self.events = events
         self.home_currency = home_currency
         self.leverage = leverage
-        self.equity = equity
+        self.backtest = backtest
+        self.equity = self._get_account_balance()
         self.balance = deepcopy(self.equity)
         self.risk_per_trade = risk_per_trade
-        self.backtest = backtest
         self.trade_units = self.calc_risk_position_size()
         self.positions = {}
         if self.backtest:
             self.backtest_file = self.create_equity_file()
         self.logger = logging.getLogger(__name__)
+
+    def _get_account_balance(self):
+        if self.backtest:
+            return Decimal("100000.00")
+
+        endpoint = '/summary'
+
+        response = BaseClient().get(endpoint)
+
+        if 'account' not in response:
+            raise Exception('Unable to retrieve account information.')
+
+        equity = Decimal(response['account']['balance'])
+        return equity
+
 
     def calc_risk_position_size(self):
         return self.equity * self.risk_per_trade

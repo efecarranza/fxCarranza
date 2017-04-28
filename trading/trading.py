@@ -58,7 +58,6 @@ if __name__ == "__main__":
 
     heartbeat = 0.0  # Time in seconds between polling
     events = queue.Queue()
-    equity = settings.EQUITY
 
     # Pairs to include in streaming data set
     pairs = ["EURUSD", "GBPUSD"]
@@ -75,7 +74,7 @@ if __name__ == "__main__":
     # compare the OANDA positions with the local, to
     # ensure backtesting integrity.
     portfolio = Portfolio(
-        prices, events, equity=equity, backtest=False
+        prices, events, backtest=False
     )
 
     # Create the execution handler making sure to
