@@ -27,18 +27,26 @@ class BaseClient(object):
             s.close()
             print("Caught exception when connecting to stream\n" + str(e))
 
-    def get(self, endpoint, params={}):
+    def send_request(self, request_type, endpoint, params={}):
         url = self.api_url + endpoint
 
-        r = requests.get(url, headers=self.headers, params=params)
+        if request_type == 'GET':
+            r = self.get(url, params)
+        elif request_type == 'POST':
+            r = self.post(url, params)
+        elif request_type == 'PUT':
+            r = self.put(url, params)
 
-        if r.status_code != 200:
-            raise Exception('Error during request to Oanda API', r.status_code)
+        if r.status_code != 200 and r.status_code != 201:
+            raise Exception('Error during ' + request_type + ' request to Oanda API', r.status_code)
 
         return r.json()
 
-    def post(self):
-        pass
+    def get(self, url, params):
+        return requests.get(url, headers=self.headers, params=params)
 
-    def put(self):
-        pass
+    def post(self, url, data):
+        return requests.post(url, headers=self.headers, data=data)
+
+    def put(self, url, data):
+        return requests.put(url, headers=self.headers, data=data)

@@ -44,7 +44,7 @@ class Portfolio(object):
 
         endpoint = '/summary'
 
-        response = BaseClient().get(endpoint)
+        response = BaseClient().send_request('GET', endpoint)
 
         if 'account' not in response:
             raise Exception('Unable to retrieve account information.')
