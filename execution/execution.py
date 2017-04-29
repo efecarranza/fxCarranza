@@ -1,10 +1,6 @@
 from __future__ import print_function
 
 from abc import ABCMeta, abstractmethod
-try:
-    import httplib
-except ImportError:
-    import http.client as httplib
 import logging
 try:
     from urllib import urlencode
@@ -13,6 +9,7 @@ except ImportError:
 import urllib3
 urllib3.disable_warnings()
 
+from qsforex.client.base_client import BaseClient
 
 class ExecutionHandler(object):
     """
@@ -43,35 +40,21 @@ class SimulatedExecution(object):
 
 
 class OANDAExecutionHandler(ExecutionHandler):
-    def __init__(self, domain, access_token, account_id):
-        self.domain = domain
-        self.access_token = access_token
-        self.account_id = account_id
-        self.conn = self.obtain_connection()
+    def __init__(self):
         self.logger = logging.getLogger(__name__)
-
-    def obtain_connection(self):
-        return httplib.HTTPSConnection(self.domain)
 
     def execute_order(self, event):
         print('Executing Order')
         return
         instrument = "%s_%s" % (event.instrument[:3], event.instrument[3:])
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Authorization": "Bearer " + self.access_token
-        }
         params = urlencode({
             "instrument" : instrument,
             "units" : event.units,
             "type" : event.order_type,
             "side" : event.side
         })
-        self.conn.request(
-            "POST", 
-            "/v1/accounts/%s/orders" % str(self.account_id), 
-            params, headers
-        )
+
+        response = BaseClient().send_request('POST', params)
         response = self.conn.getresponse().read().decode("utf-8").replace("\n","").replace("\t","")
         self.logger.debug(response)
 

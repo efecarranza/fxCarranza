@@ -77,11 +77,7 @@ if __name__ == "__main__":
 
     # Create the execution handler making sure to
     # provide authentication commands
-    execution = OANDAExecutionHandler(
-        settings.API_DOMAIN, 
-        settings.ACCESS_TOKEN, 
-        settings.ACCOUNT_ID
-    )
+    execution = OANDAExecutionHandler()
     
     # Create two separate threads: One for the trading loop
     # and another for the market price streaming class
