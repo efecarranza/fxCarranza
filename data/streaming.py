@@ -16,6 +16,7 @@ class StreamingForexPrices(PriceHandler):
         self.pairs = pairs
         self.prices = self._set_up_prices_dict()
         self.logger = logging.getLogger(__name__)
+        self.client = BaseClient()
 
     def invert_prices(self, pair, bid, ask):
         """
@@ -37,7 +38,7 @@ class StreamingForexPrices(PriceHandler):
         pairs_oanda = ["%s_%s" % (p[:3], p[3:]) for p in self.pairs]
         pair_list = ",".join(pairs_oanda)
         
-        return BaseClient().connect_to_stream(pair_list)
+        return self.client.connect_to_stream(pair_list)
 
     def stream_to_queue(self):
         response = self.connect_to_stream()

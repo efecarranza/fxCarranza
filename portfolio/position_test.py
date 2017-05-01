@@ -14,7 +14,6 @@ class TickerMock(object):
         self.pairs = ["GBPUSD", "EURUSD"]
         self.prices = {
             "GBPUSD": {"bid": Decimal("1.50328"), "ask": Decimal("1.50349")},
-            "USDGBP": {"bid": Decimal("0.66521"), "ask": Decimal("0.66512")},
             "EURUSD": {"bid": Decimal("1.07832"), "ask": Decimal("1.07847")}
         }
 
@@ -30,7 +29,7 @@ class TestLongGBPUSDPosition(unittest.TestCase):
     denominated currency of GBP, using 2,000 units of GBP/USD.
     """
     def setUp(self):
-        home_currency = "GBP"
+        home_currency = "USD"
         position_type = "long"
         currency_pair = "GBPUSD"
         units = Decimal("2000")
@@ -42,15 +41,15 @@ class TestLongGBPUSDPosition(unittest.TestCase):
 
     def test_calculate_init_pips(self):
         pos_pips = self.position.calculate_pips()
-        self.assertEqual(pos_pips, Decimal("-0.00021"))
+        self.assertEqual(pos_pips, Decimal("-2.100"))
 
     def test_calculate_init_profit_base(self):
         profit_base = self.position.calculate_profit_base()
-        self.assertEqual(profit_base, Decimal("-0.27939"))
+        self.assertEqual(profit_base, Decimal("-0.42000"))
 
     def test_calculate_init_profit_perc(self):
         profit_perc = self.position.calculate_profit_perc()
-        self.assertEqual(profit_perc, Decimal("-0.01397"))
+        self.assertEqual(profit_perc, Decimal("-0.02100"))
 
     def test_calculate_updated_values(self):
         """
@@ -59,18 +58,17 @@ class TestLongGBPUSDPosition(unittest.TestCase):
         """
         prices = self.position.ticker.prices
         prices["GBPUSD"] = {"bid": Decimal("1.50486"), "ask": Decimal("1.50586")}
-        prices["USDGBP"] = {"bid": Decimal("0.66451"), "ask": Decimal("0.66407")}
         self.position.update_position_price()
 
         # Check pips
         pos_pips = self.position.calculate_pips()
-        self.assertEqual(pos_pips, Decimal("0.00137"))
+        self.assertEqual(pos_pips, Decimal("13.7000"))
         # Check profit base
         profit_base = self.position.calculate_profit_base()
-        self.assertEqual(profit_base, Decimal("1.82076"))
+        self.assertEqual(profit_base, Decimal("2.74000"))
         # Check profit percentage
         profit_perc = self.position.calculate_profit_perc()
-        self.assertEqual(profit_perc, Decimal("0.09104"))
+        self.assertEqual(profit_perc, Decimal("0.1370"))
 
 
 class TestShortGBPUSDPosition(unittest.TestCase):
@@ -79,7 +77,7 @@ class TestShortGBPUSDPosition(unittest.TestCase):
     denominated currency of GBP, using 2,000 units of GBP/USD.
     """
     def setUp(self):
-        home_currency = "GBP"
+        home_currency = "USD"
         position_type = "short"
         currency_pair = "GBPUSD"
         units = Decimal("2000")
@@ -91,15 +89,15 @@ class TestShortGBPUSDPosition(unittest.TestCase):
 
     def test_calculate_init_pips(self):
         pos_pips = self.position.calculate_pips()
-        self.assertEqual(pos_pips, Decimal("-0.00021"))
+        self.assertEqual(pos_pips, Decimal("-2.1000"))
 
     def test_calculate_init_profit_base(self):
         profit_base = self.position.calculate_profit_base()
-        self.assertEqual(profit_base, Decimal("-0.27935"))
+        self.assertEqual(profit_base, Decimal("-0.4200"))
 
     def test_calculate_init_profit_perc(self):
         profit_perc = self.position.calculate_profit_perc()
-        self.assertEqual(profit_perc, Decimal("-0.01397"))
+        self.assertEqual(profit_perc, Decimal("-0.02100"))
 
     def test_calculate_updated_values(self):
         """
@@ -108,18 +106,17 @@ class TestShortGBPUSDPosition(unittest.TestCase):
         """
         prices = self.position.ticker.prices
         prices["GBPUSD"] = {"bid": Decimal("1.50486"), "ask": Decimal("1.50586")}
-        prices["USDGBP"] = {"bid": Decimal("0.66451"), "ask": Decimal("0.66407")}
         self.position.update_position_price()
 
         # Check pips
         pos_pips = self.position.calculate_pips()
-        self.assertEqual(pos_pips, Decimal("-0.00258"))
+        self.assertEqual(pos_pips, Decimal("-25.80000"))
         # Check profit base
         profit_base = self.position.calculate_profit_base()
-        self.assertEqual(profit_base, Decimal("-3.42660"))
+        self.assertEqual(profit_base, Decimal("-5.16000"))
         # Check profit percentage
         profit_perc = self.position.calculate_profit_perc()
-        self.assertEqual(profit_perc, Decimal("-0.17133"))
+        self.assertEqual(profit_perc, Decimal("-0.25800"))
 
 
 # =====================================
@@ -132,7 +129,7 @@ class TestLongEURUSDPosition(unittest.TestCase):
     denominated currency of GBP, using 2,000 units of EUR/USD.
     """
     def setUp(self):
-        home_currency = "GBP"
+        home_currency = "USD"
         position_type = "long"
         currency_pair = "EURUSD"
         units = Decimal("2000")
@@ -144,15 +141,15 @@ class TestLongEURUSDPosition(unittest.TestCase):
 
     def test_calculate_init_pips(self):
         pos_pips = self.position.calculate_pips()
-        self.assertEqual(pos_pips, Decimal("-0.00015"))
+        self.assertEqual(pos_pips, Decimal("-1.5000"))
 
     def test_calculate_init_profit_base(self):
         profit_base = self.position.calculate_profit_base()
-        self.assertEqual(profit_base, Decimal("-0.19956"))
+        self.assertEqual(profit_base, Decimal("-0.30000"))
 
     def test_calculate_init_profit_perc(self):
         profit_perc = self.position.calculate_profit_perc()
-        self.assertEqual(profit_perc, Decimal("-0.00998"))
+        self.assertEqual(profit_perc, Decimal("-0.01500"))
 
     def test_calculate_updated_values(self):
         """
@@ -160,29 +157,27 @@ class TestLongEURUSDPosition(unittest.TestCase):
         pips, profit and percentage profit calculations are correct.
         """
         prices = self.position.ticker.prices
-        prices["GBPUSD"] = {"bid": Decimal("1.50486"), "ask": Decimal("1.50586")}
-        prices["USDGBP"] = {"bid": Decimal("0.66451"), "ask": Decimal("0.66407")}
         prices["EURUSD"] = {"bid": Decimal("1.07811"), "ask": Decimal("1.07827")}
         self.position.update_position_price()
 
         # Check pips
         pos_pips = self.position.calculate_pips()
-        self.assertEqual(pos_pips, Decimal("-0.00036"))
+        self.assertEqual(pos_pips, Decimal("-3.60000"))
         # Check profit base
         profit_base = self.position.calculate_profit_base()
-        self.assertEqual(profit_base, Decimal("-0.47845"))
+        self.assertEqual(profit_base, Decimal("-0.72000"))
         # Check profit percentage
         profit_perc = self.position.calculate_profit_perc()
-        self.assertEqual(profit_perc, Decimal("-0.02392"))
+        self.assertEqual(profit_perc, Decimal("-0.03600"))
 
 
-class TestLongEURUSDPosition(unittest.TestCase):
+class TestShortEURUSDPosition(unittest.TestCase):
     """
     Unit tests that cover going short EUR/USD with an account
     denominated currency of GBP, using 2,000 units of EUR/USD.
     """
     def setUp(self):
-        home_currency = "GBP"
+        home_currency = "USD"
         position_type = "short"
         currency_pair = "EURUSD"
         units = Decimal("2000")
@@ -194,15 +189,15 @@ class TestLongEURUSDPosition(unittest.TestCase):
 
     def test_calculate_init_pips(self):
         pos_pips = self.position.calculate_pips()
-        self.assertEqual(pos_pips, Decimal("-0.00015"))
+        self.assertEqual(pos_pips, Decimal("-1.50000"))
 
     def test_calculate_init_profit_base(self):
         profit_base = self.position.calculate_profit_base()
-        self.assertEqual(profit_base, Decimal("-0.19954"))
+        self.assertEqual(profit_base, Decimal("-0.30000"))
 
     def test_calculate_init_profit_perc(self):
         profit_perc = self.position.calculate_profit_perc()
-        self.assertEqual(profit_perc, Decimal("-0.00998"))
+        self.assertEqual(profit_perc, Decimal("-0.01500"))
 
     def test_calculate_updated_values(self):
         """
@@ -210,20 +205,18 @@ class TestLongEURUSDPosition(unittest.TestCase):
         pips, profit and percentage profit calculations are correct.
         """
         prices = self.position.ticker.prices
-        prices["GBPUSD"] = {"bid": Decimal("1.50486"), "ask": Decimal("1.50586")}
-        prices["USDGBP"] = {"bid": Decimal("0.66451"), "ask": Decimal("0.66407")}
         prices["EURUSD"] = {"bid": Decimal("1.07811"), "ask": Decimal("1.07827")}
         self.position.update_position_price()
 
         # Check pips
         pos_pips = self.position.calculate_pips()
-        self.assertEqual(pos_pips, Decimal("0.00005"))
+        self.assertEqual(pos_pips, Decimal("0.50000"))
         # Check profit base
         profit_base = self.position.calculate_profit_base()
-        self.assertEqual(profit_base, Decimal("0.06641"))
+        self.assertEqual(profit_base, Decimal("0.10000"))
         # Check profit percentage
         profit_perc = self.position.calculate_profit_perc()
-        self.assertEqual(profit_perc, Decimal("0.00332"))
+        self.assertEqual(profit_perc, Decimal("0.00500"))
 
 
 if __name__ == "__main__":

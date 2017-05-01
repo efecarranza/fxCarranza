@@ -2,6 +2,8 @@ from decimal import Decimal, getcontext, ROUND_HALF_DOWN
 
 
 class Position(object):
+    CONTRACT_SIZE = Decimal("100000.00")
+
     def __init__(
         self, home_currency, position_type, 
         currency_pair, units, ticker
@@ -10,6 +12,7 @@ class Position(object):
         self.position_type = position_type  # Long or short
         self.currency_pair = currency_pair  # Intended traded currency pair
         self.units = units
+        self.pip_value = Decimal("0.0001") * units
         self.ticker = ticker
         self.set_up_currencies()
         self.profit_base = self.calculate_profit_base()
@@ -30,19 +33,17 @@ class Position(object):
             mult = Decimal("1")
         elif self.position_type == "short":
             mult = Decimal("-1")
-        pips = (mult * (self.cur_price - self.avg_price)).quantize(
-            Decimal("0.00001"), ROUND_HALF_DOWN
-        )
+        pips = (mult * (self.cur_price - self.avg_price)) * Decimal("10000")
         return pips
 
     def calculate_profit_base(self):
         pips = self.calculate_pips()
-        ticker_qh = self.ticker.prices[self.currency_pair]
+        ticker = self.ticker.prices[self.currency_pair]
         if self.position_type == "long":
-            qh_close = ticker_qh["bid"]
+            close = ticker["bid"]
         else:
-            qh_close = ticker_qh["ask"]
-        profit = pips * qh_close * self.units
+            close = ticker["ask"]
+        profit = pips * self.pip_value
         return profit.quantize(
             Decimal("0.00001"), ROUND_HALF_DOWN
         )   
