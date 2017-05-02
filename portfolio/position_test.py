@@ -14,7 +14,8 @@ class TickerMock(object):
         self.pairs = ["GBPUSD", "EURUSD"]
         self.prices = {
             "GBPUSD": {"bid": Decimal("1.50328"), "ask": Decimal("1.50349")},
-            "EURUSD": {"bid": Decimal("1.07832"), "ask": Decimal("1.07847")}
+            "EURUSD": {"bid": Decimal("1.07832"), "ask": Decimal("1.07847")},
+            "USDCAD": {"bid": Decimal("1.37200"), "ask": Decimal("1.37220")},
         }
 
 
@@ -34,9 +35,12 @@ class TestLongGBPUSDPosition(unittest.TestCase):
         currency_pair = "GBPUSD"
         units = Decimal("2000")
         ticker = TickerMock()
+        take_profit = "1.50649"
+        stop_loss = "1.50049"
         self.position = Position(
             home_currency, position_type, 
-            currency_pair, units, ticker
+            currency_pair, units, ticker,
+            take_profit, stop_loss
         )
 
     def test_calculate_init_pips(self):
@@ -82,9 +86,12 @@ class TestShortGBPUSDPosition(unittest.TestCase):
         currency_pair = "GBPUSD"
         units = Decimal("2000")
         ticker = TickerMock()
+        take_profit = "1.50049"
+        stop_loss = "1.50649"
         self.position = Position(
             home_currency, position_type, 
-            currency_pair, units, ticker
+            currency_pair, units, ticker,
+            take_profit, stop_loss
         )
 
     def test_calculate_init_pips(self):
@@ -134,9 +141,12 @@ class TestLongEURUSDPosition(unittest.TestCase):
         currency_pair = "EURUSD"
         units = Decimal("2000")
         ticker = TickerMock()
+        take_profit = "1.08147"
+        stop_loss = "1.07532"
         self.position = Position(
             home_currency, position_type, 
-            currency_pair, units, ticker
+            currency_pair, units, ticker,
+            take_profit, stop_loss
         )
 
     def test_calculate_init_pips(self):
@@ -182,6 +192,8 @@ class TestShortEURUSDPosition(unittest.TestCase):
         currency_pair = "EURUSD"
         units = Decimal("2000")
         ticker = TickerMock()
+        take_profit = "1.07532"
+        stop_loss = "1.08147"
         self.position = Position(
             home_currency, position_type, 
             currency_pair, units, ticker
@@ -218,6 +230,24 @@ class TestShortEURUSDPosition(unittest.TestCase):
         profit_perc = self.position.calculate_profit_perc()
         self.assertEqual(profit_perc, Decimal("0.00500"))
 
+class TestCalculatePipValue(unittest.TestCase):
+    def test_calculate_pip_value_with_USD_base(self):
+        position = Position(
+            "USD", "long", 
+            "EURUSD", 2000, TickerMock(),
+            "1.08147", "1.07532"
+        )
+        pip_value = position.calculate_pip_value()
+        self.assertEqual(pip_value, Decimal("0.2"))
+
+    def test_calculate_pip_value_with_CAD_base(self):
+        position = Position(
+            "USD", "long", 
+            "USDCAD", 2000, TickerMock(),
+            "1.3753", "1.3693"
+        )
+        pip_value = position.calculate_pip_value()
+        self.assertEqual(pip_value, Decimal("0.15"))
 
 if __name__ == "__main__":
     unittest.main()

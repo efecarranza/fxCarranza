@@ -40,10 +40,11 @@ class Position(object):
         return pips
 
     def calculate_pip_value(self):
-        if self.currency_pair[:3] == 'USD':
+        if self.currency_pair[-3:] == 'USD':
             return Decimal("0.0001") * self.units
         else:
-            return Decima("0.0001") * self.units / self.avg_price
+            pip_value = Decimal("0.0001") * self.units / self.avg_price
+            return pip_value.quantize(Decimal("0.01", ROUND_HALF_DOWN))
 
     def calculate_profit_base(self):
         pips = self.calculate_pips()
