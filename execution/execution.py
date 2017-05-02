@@ -27,7 +27,7 @@ class ExecutionHandler(object):
         raise NotImplementedError("Should implement execute_order()")
 
 
-class SimulatedExecution(object):
+class SimulatedExecution(ExecutionHandler):
     """
     Provides a simulated execution handling environment. This class
     actually does nothing - it simply receives an order to execute.
