@@ -1,12 +1,14 @@
 import psycopg2
+from fxcarranza import settings
 
 class DBConnection(object):
     def connect(self, query):
         try:
             print('Connecting to the PostgreSQL database...')
 
-            conn = psycopg2.connect(host="localhost",database="fxcarranza",
-                user="efecarranza", password="efecarranza")
+            conn = psycopg2.connect(host="localhost",database=settings.DATABASE_NAME,
+                user=settings.DATABASE_USERNAME, password=settings.DATABASE_PASSWORD)
+
             cur = conn.cursor()
 
             cur.execute(query)
