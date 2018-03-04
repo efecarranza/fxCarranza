@@ -2,7 +2,7 @@ from decimal import Decimal
 import os
 
 
-ENVIRONMENTS = { 
+ENVIRONMENTS = {
     "streaming": {
         "practice": "stream-fxpractice.oanda.com",
         "sandbox": "stream-sandbox.oanda.com"
@@ -21,8 +21,8 @@ OUTPUT_RESULTS_DIR = 'output-results'
 DOMAIN = "practice"
 STREAM_DOMAIN = ENVIRONMENTS["streaming"][DOMAIN]
 API_DOMAIN = ENVIRONMENTS["api"][DOMAIN]
-ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN', None)
-ACCOUNT_ID = os.environ.get('ACCOUNT_ID', None)
+ACCESS_TOKEN = os.environ.get('OANDA_API_ACCESS_TOKEN', None)
+ACCOUNT_ID = os.environ.get('OANDA_API_ACCOUNT_ID', None)
 
 BASE_CURRENCY = "USD"
 EQUITY = Decimal("100000.00")
