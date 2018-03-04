@@ -1,53 +1,13 @@
 import copy
+from decimal import Decimal, getcontext, ROUND_HALF_DOWN
 
 from fxcarranza.event.event import SignalEvent
 from fxcarranza.database.connection import DBConnection
 
-class TestStrategy(object):
-    """
-    A testing strategy that alternates between buying and selling
-    a currency pair on every 5th tick. This has the effect of
-    continuously "crossing the spread" and so will be loss-making
-    strategy.
-
-    It is used to test that the backtester/live trading system is
-    behaving as expected.
-    """
-    def __init__(self, pairs, events):
-        self.pairs = pairs
-        self.events = events
-        self.ticks = 0
-        self.invested = False
-
-    def calculate_signals(self, event):
-        if event.type == 'TICK' and event.instrument == self.pairs[0]:
-            if self.ticks % 5 == 0:
-                if self.invested == False:
-                    signal = SignalEvent(self.pairs[0], "market", "buy", event.time)
-                    self.events.put(signal)
-                    self.invested = True
-                else:
-                    signal = SignalEvent(self.pairs[0], "market", "sell", event.time)
-                    self.events.put(signal)
-                    self.invested = False
-            self.ticks += 1
-
-
 class MovingAverageCrossStrategy(object):
     """
-    A basic Moving Average Crossover strategy that generates
-    two simple moving averages (SMA), with default windows
-    of 500 ticks for the short SMA and 2,000 ticks for the
-    long SMA.
-
-    The strategy is "long only" in the sense it will only
-    open a long position once the short SMA exceeds the long
-    SMA. It will close the position (by taking a corresponding
-    sell order) when the long SMA recrosses the short SMA.
-
-    The strategy uses a rolling SMA calculation in order to
-    increase efficiency by eliminating the need to call two
-    full moving average calculations on each tick.
+    A trading strategy determining whether we should be in a buying
+    or in a selling period.
     """
     def __init__(
         self, pairs, events,
@@ -58,10 +18,8 @@ class MovingAverageCrossStrategy(object):
         self.events = events
         self.short_window = short_window
         self.long_window = long_window
-        self.short_ema = self.calculate_ema(short_window)
-        self.long_ema = self.calculate_ema(long_window)
-        import sys
-        sys.exit()
+        self.short_ema = self.calculate_initial_ema(short_window)
+        self.long_ema = self.calculate_initial_ema(long_window)
 
     def create_pairs_dict(self):
         attr_dict = {
@@ -75,22 +33,19 @@ class MovingAverageCrossStrategy(object):
             pairs_dict[p] = copy.deepcopy(attr_dict)
         return pairs_dict
 
-    def calculate_ema(self, window):
+    def calculate_initial_ema(self, window):
         initial_total = 0
+        multiplier = self.get_multiplier(window)
+
         conn = DBConnection()
         prices = conn.get_historical_prices("eurusd", window)
-        multiplier = 2.0 / (window + 1)
-        for price in prices:
-            print(price)
-            initial_total += price[1]
-        sma = initial_total / window
+
+        sma = self.get_sma(prices, window)
         latest_close = prices[0][1]
-        ema = ((latest_close - sma) * multiplier) + sma
-        print "((%s - %s) * %s) + %s" % (latest_close, sma, multiplier, sma)
 
+        ema = ((Decimal(latest_close) - sma) * multiplier) + sma
 
-        print(sma)
-        print(ema)
+        return ema
 
     def calc_rolling_sma(self, sma_m_1, window, price):
         return ((sma_m_1 * (window - 1)) + price) / window
@@ -121,3 +76,16 @@ class MovingAverageCrossStrategy(object):
                     self.events.put(signal)
                     pd["invested"] = False
             pd["ticks"] += 1
+
+    def get_multiplier(self, window):
+        multiplier = Decimal(2.0 / (window + 1))
+        return Decimal(multiplier.quantize(Decimal(".0001"), ROUND_HALF_DOWN))
+
+    def get_sma(self, prices, window):
+        initial_total = 0
+        for price in prices:
+            initial_total += price[1]
+
+        sma = Decimal(initial_total / window)
+
+        return Decimal(sma.quantize(Decimal(".0001"), ROUND_HALF_DOWN))
