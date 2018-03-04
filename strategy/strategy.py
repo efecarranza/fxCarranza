@@ -1,7 +1,7 @@
 import copy
 
 from fxcarranza.event.event import SignalEvent
-
+from fxcarranza.database.connection import DBConnection
 
 class TestStrategy(object):
     """
@@ -51,13 +51,15 @@ class MovingAverageCrossStrategy(object):
     """
     def __init__(
         self, pairs, events,
-        short_window=500, long_window=2000
+        short_window=9, long_window=18
     ):
         self.pairs = pairs
         self.pairs_dict = self.create_pairs_dict()
         self.events = events
         self.short_window = short_window
         self.long_window = long_window
+        self.short_ema = self.calculate_ema(short_window)
+        self.long_ema = self.calculate_ema(long_window)
 
     def create_pairs_dict(self):
         attr_dict = {
@@ -70,6 +72,9 @@ class MovingAverageCrossStrategy(object):
         for p in self.pairs:
             pairs_dict[p] = copy.deepcopy(attr_dict)
         return pairs_dict
+
+    def calculate_ema(self, window):
+        prices = DBConnection.get_historical_prices("eurusd", window)
 
     def calc_rolling_sma(self, sma_m_1, window, price):
         return ((sma_m_1 * (window - 1)) + price) / window
