@@ -60,6 +60,8 @@ class MovingAverageCrossStrategy(object):
         self.long_window = long_window
         self.short_ema = self.calculate_ema(short_window)
         self.long_ema = self.calculate_ema(long_window)
+        import sys
+        sys.exit()
 
     def create_pairs_dict(self):
         attr_dict = {
@@ -74,7 +76,21 @@ class MovingAverageCrossStrategy(object):
         return pairs_dict
 
     def calculate_ema(self, window):
-        prices = DBConnection.get_historical_prices("eurusd", window)
+        initial_total = 0
+        conn = DBConnection()
+        prices = conn.get_historical_prices("eurusd", window)
+        multiplier = 2.0 / (window + 1)
+        for price in prices:
+            print(price)
+            initial_total += price[1]
+        sma = initial_total / window
+        latest_close = prices[0][1]
+        ema = ((latest_close - sma) * multiplier) + sma
+        print "((%s - %s) * %s) + %s" % (latest_close, sma, multiplier, sma)
+
+
+        print(sma)
+        print(ema)
 
     def calc_rolling_sma(self, sma_m_1, window, price):
         return ((sma_m_1 * (window - 1)) + price) / window

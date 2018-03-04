@@ -14,7 +14,7 @@ import time
 from fxcarranza.execution.execution import OANDAExecutionHandler
 from fxcarranza.portfolio.portfolio import Portfolio
 from fxcarranza import settings
-from fxcarranza.strategy.strategy import TestStrategy
+from fxcarranza.strategy.strategy import MovingAverageCrossStrategy
 from fxcarranza.data.streaming import StreamingForexPrices
 
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     # Create the strategy/signal generator, passing the
     # instrument and the events queue
-    strategy = TestStrategy(pairs, events)
+    strategy = MovingAverageCrossStrategy(pairs, events)
 
     # Create the portfolio object that will be used to
     # compare the OANDA positions with the local, to

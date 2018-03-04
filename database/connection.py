@@ -23,7 +23,7 @@ class DBConnection(object):
                 conn.close()
 
     def get_historical_prices(self, table, number_of_records):
-        query = "SELECT Date, Close FROM %s LIMIT %s") % (table, number_of_records)
+        query = "SELECT transaction_date, close_price FROM %s LIMIT %s" % (table, number_of_records)
         return self.connect(query)
 
 if __name__ == '__main__':
