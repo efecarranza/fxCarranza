@@ -7,11 +7,11 @@ import os
 
 import pandas as pd
 
-from qsforex.event.event import OrderEvent
-from qsforex.performance.performance import create_drawdowns
-from qsforex.portfolio.position import Position
-from qsforex.settings import OUTPUT_RESULTS_DIR
-from qsforex.client.base_client import BaseClient
+from fxcarranza.event.event import OrderEvent
+from fxcarranza.performance.performance import create_drawdowns
+from fxcarranza.portfolio.position import Position
+from fxcarranza.settings import OUTPUT_RESULTS_DIR
+from fxcarranza.client.base_client import BaseClient
 
 
 class Portfolio(object):
@@ -60,7 +60,7 @@ class Portfolio(object):
         self, position_type, currency_pair, units, ticker
     ):
         ps = Position(
-            self.home_currency, position_type, 
+            self.home_currency, position_type,
             currency_pair, units, ticker
         )
         self.positions[currency_pair] = ps
@@ -105,12 +105,12 @@ class Portfolio(object):
         return out_file
 
     def output_results(self):
-        # Closes off the Backtest.csv file so it can be 
+        # Closes off the Backtest.csv file so it can be
         # read via Pandas without problems
         self.backtest_file.close()
-        
+
         in_filename = "backtest.csv"
-        out_filename = "equity.csv" 
+        out_filename = "equity.csv"
         in_file = os.path.join(OUTPUT_RESULTS_DIR, in_filename)
         out_file = os.path.join(OUTPUT_RESULTS_DIR, out_filename)
 
@@ -120,12 +120,12 @@ class Portfolio(object):
         df["Total"] = df.sum(axis=1)
         df["Returns"] = df["Total"].pct_change()
         df["Equity"] = (1.0+df["Returns"]).cumprod()
-        
+
         # Create drawdown statistics
         drawdown, max_dd, dd_duration = create_drawdowns(df["Equity"])
         df["Drawdown"] = drawdown
         df.to_csv(out_file, index=True)
-        
+
         print("Simulation complete and results exported to %s" % out_filename)
 
     def update_portfolio(self, tick_event):
@@ -164,7 +164,7 @@ class Portfolio(object):
             currency_pair = signal_event.instrument
             units = int(self.trade_units)
             time = signal_event.time
-            
+
             # If there is no position, create one
             if currency_pair not in self.positions:
                 if side == "buy":
@@ -172,7 +172,7 @@ class Portfolio(object):
                 else:
                     position_type = "short"
                 self.add_new_position(
-                    position_type, currency_pair, 
+                    position_type, currency_pair,
                     units, self.ticker
                 )
 
@@ -200,7 +200,7 @@ class Portfolio(object):
                         return
                     elif units > ps.units:
                         return
-                        
+
                 elif side == "sell" and ps.position_type == "short":
                     add_position_units(currency_pair, units)
 
@@ -210,4 +210,4 @@ class Portfolio(object):
             self.logger.info("Portfolio Balance: %s" % self.balance)
         else:
             self.logger.info("Unable to execute order as price data was insufficient.")
-        
+

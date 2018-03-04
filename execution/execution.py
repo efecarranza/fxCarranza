@@ -9,7 +9,7 @@ except ImportError:
 import urllib3
 urllib3.disable_warnings()
 
-from qsforex.client.base_client import BaseClient
+from fxcarranza.client.base_client import BaseClient
 
 class ExecutionHandler(object):
     """
@@ -60,4 +60,4 @@ class OANDAExecutionHandler(ExecutionHandler):
 
         self.conn.close()
 
-        
+

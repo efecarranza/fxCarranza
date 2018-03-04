@@ -2,7 +2,7 @@ import requests
 import logging
 import json
 
-from qsforex import settings
+from fxcarranza import settings
 
 class BaseClient(object):
     def __init__(self):

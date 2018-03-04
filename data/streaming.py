@@ -6,9 +6,9 @@ import json
 
 import requests
 
-from qsforex.event.event import TickEvent
-from qsforex.data.price import PriceHandler
-from qsforex.client.base_client import BaseClient
+from fxcarranza.event.event import TickEvent
+from fxcarranza.data.price import PriceHandler
+from fxcarranza.client.base_client import BaseClient
 
 class StreamingForexPrices(PriceHandler):
     def __init__(self, pairs, events_queue):
@@ -37,7 +37,7 @@ class StreamingForexPrices(PriceHandler):
     def connect_to_stream(self):
         pairs_oanda = ["%s_%s" % (p[:3], p[3:]) for p in self.pairs]
         pair_list = ",".join(pairs_oanda)
-        
+
         return self.client.connect_to_stream(pair_list)
 
     def stream_to_queue(self):
@@ -56,7 +56,7 @@ class StreamingForexPrices(PriceHandler):
                     return
                 if "instrument" in msg:
                     self.logger.debug(msg)
-                    getcontext().rounding = ROUND_HALF_DOWN 
+                    getcontext().rounding = ROUND_HALF_DOWN
                     instrument = msg["instrument"].replace("_", "")
                     time = msg["time"]
                     bid = Decimal(str(msg["bids"][0]["price"])).quantize(

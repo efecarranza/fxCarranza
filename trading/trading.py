@@ -11,16 +11,16 @@ except ImportError:
 import threading
 import time
 
-from qsforex.execution.execution import OANDAExecutionHandler
-from qsforex.portfolio.portfolio import Portfolio
-from qsforex import settings
-from qsforex.strategy.strategy import TestStrategy
-from qsforex.data.streaming import StreamingForexPrices
+from fxcarranza.execution.execution import OANDAExecutionHandler
+from fxcarranza.portfolio.portfolio import Portfolio
+from fxcarranza import settings
+from fxcarranza.strategy.strategy import TestStrategy
+from fxcarranza.data.streaming import StreamingForexPrices
 
 
 def trade(events, strategy, portfolio, execution, heartbeat):
     """
-    Carries out an infinite while loop that polls the 
+    Carries out an infinite while loop that polls the
     events queue and directs each event to either the
     strategy component of the execution handler. The
     loop will then pause for "heartbeat" seconds and
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     this_src_path = dirname(abspath(getsourcefile(lambda:0)))
     log_conf_file = join('..', 'logging.conf')
     logging.config.fileConfig(normpath(join(this_src_path, log_conf_file)))
-    logger = logging.getLogger('qsforex.trading.trading')
+    logger = logging.getLogger('fxcarranza.trading.trading')
 
     # Set the number of decimal places to 2
     getcontext().prec = 2
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     # making sure to provide authentication commands
     prices = StreamingForexPrices(pairs, events)
 
-    # Create the strategy/signal generator, passing the 
+    # Create the strategy/signal generator, passing the
     # instrument and the events queue
     strategy = TestStrategy(pairs, events)
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     # Create the execution handler making sure to
     # provide authentication commands
     execution = OANDAExecutionHandler()
-    
+
     # Create two separate threads: One for the trading loop
     # and another for the market price streaming class
     trade_thread = threading.Thread(
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         )
     )
     price_thread = threading.Thread(target=prices.stream_to_queue, args=[])
-    
+
     # Start both threads
     logger.info("Starting trading thread")
     trade_thread.start()
