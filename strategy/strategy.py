@@ -47,8 +47,12 @@ class MovingAverageCrossStrategy(object):
 
         return ema
 
-    def calc_rolling_sma(self, sma_m_1, window, price):
-        return ((sma_m_1 * (window - 1)) + price) / window
+    def calc_rolling_ema(self, current_ema, window, price):
+        multiplier = self.get_multiplier(window)
+        ema = ((Decimal(price) - current_ema) * multiplier) + current_ema
+
+        return Decimal(ema.quantize(Decimal(".0001"), ROUND_HALF_DOWN))
+
 
     def calculate_signals(self, event):
         if event.type == 'TICK':

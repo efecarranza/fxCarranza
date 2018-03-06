@@ -28,6 +28,17 @@ class TestHelperMethods(unittest.TestCase):
         multiplier = self.strategy.get_multiplier(10)
         self.assertEquals(Decimal("0.1818"), multiplier)
 
+    def test_calc_rolling_ema_window_9(self):
+        current_ema = Decimal("1.2000")
+        window = 9
+        rolling_ema = self.strategy.calc_rolling_ema(current_ema, window, "1.2100")
+        self.assertEquals(rolling_ema, Decimal("1.2020"))
+
+    def test_calc_rolling_ema_window_10(self):
+        current_ema = Decimal("1.2000")
+        window = 10
+        rolling_ema = self.strategy.calc_rolling_ema(current_ema, window, "1.2100")
+        self.assertEquals(rolling_ema, Decimal("1.2018"))
 
 if __name__ == "__main__":
     unittest.main()
