@@ -54,7 +54,7 @@ if __name__ == "__main__":
     logger = logging.getLogger('fxcarranza.trading.trading')
 
     # Set the number of decimal places to 2
-    getcontext().prec = 2
+    # getcontext().prec = 2
 
     heartbeat = 0.0  # Time in seconds between polling
     events = queue.Queue()
