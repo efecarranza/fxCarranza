@@ -12,6 +12,6 @@ scikit-learn==0.16.1
 scipy==0.15.1
 seaborn==0.5.1
 six==1.9.0
-urllib3==1.10.4
+urllib3==1.26.5
 psycopg2==2.7.4
 pygresql==5.0.4
